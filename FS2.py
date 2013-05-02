@@ -18,50 +18,23 @@ def capture_frame():
 
 def hybrid_process(hybframe):
     """Process frame using a gradient-Laplacian hybrid."""
-    global edges
-    global ldeg
-    global scaledsize
-    global asciiGroup
-    global terminalwidth
-    global dw
+    global summation
 
-    hybprinted = gradient_process(hybframe)
+    hybgrad = gradient_process(hybframe)
+    hyblap = laplacian_process(hybframe)
 
-    Threshold(hybframe, hybframe, th, clr, CV_THRESH_BINARY)
-    Laplace(hybframe, edges, ldeg)
-    Convert(edges, hybframe)
-    Resize(hybframe, scaled)
+    Add(hybgrad, hyblap, summation)
 
-    pixelnum = 0
-    for y in range(scaled.height):
-        pixelnum += int((terminalwidth - dw) / 2)
-        for x in range(scaled.width):
-            pixelnum += 1
-            if scaled[y, x] != 0:
-                hybprinted = (hybprinted[:pixelnum - 1] + asciiGroup[0] + (hybprinted[pixelnum:] * (pixelnum != (len(hybprinted) - 1))))
-        pixelnum += 1 * (y != (scaled.height - 1))
-
-    return hybprinted
+    return summation
 
 
 def gradient_process(gradframe):
     """Process frame using only a gradient."""
-    global scaled
-    global terminalwidth
-    global dw
-    global asciiGroup
+    global gradscaled
 
-    Resize(gradframe, scaled)
+    Resize(gradframe, gradscaled)
 
-    printed = ''
-    for y in range(scaled.height):
-        printed = printed + ' ' * int((terminalwidth - dw) / 2)
-        for x in range(scaled.width):
-            printed = printed + asciiGroup[int(-1 + len(
-                asciiGroup) - ((scaled[y, x] * len(asciiGroup)) // 256))]
-        printed = printed + '\n' * (y != scaled.height - 1)
-
-    return printed
+    return GetMat(gradscaled)
 
 
 def laplacian_process(lapframe):
@@ -70,32 +43,33 @@ def laplacian_process(lapframe):
     global clr
     global edges
     global ldeg
-    global scaled
-    global terminalwidth
-    global dw    
-
+    global lapscaled
+ 
     Threshold(lapframe, lapframe, th, clr, CV_THRESH_BINARY)
     Laplace(lapframe, edges, ldeg)
     Convert(edges, lapframe)
-    Resize(lapframe, scaled)
+    Resize(lapframe, lapscaled)
 
+    return GetMat(lapscaled)
+
+
+def print_output(printmat):
+    """Print the image as a string of ASCII characters"""
     printed = ''
-    for y in range(scaled.height):
+    for y in range(printmat.height):
         printed = printed + ' ' * int((terminalwidth - dw) / 2)
-        for x in range(scaled.width):
+        for x in range(printmat.width):
             printed = printed + asciiGroup[int(-1 + len(
-                asciiGroup) - ((scaled[y, x] * len(asciiGroup)) // 256))]
-        printed = printed + '\n' * (y != scaled.height - 1)
+                asciiGroup) - ((printmat[y, x] * len(asciiGroup)) // 256))]
+        printed = printed + '\n' * (y != (printmat.height - 1))
 
-    return printed
+    os.system('clear')
+    print(printed)
 
 
 def run(gradient, laplacian):
     """Capture and process feed from webcam"""
-    # while True:
-    from time import time
-    starttime = time()
-    for x in range(100):
+    while True:
         rawframe = capture_frame()
 
         if gradient and laplacian:
@@ -107,10 +81,9 @@ def run(gradient, laplacian):
         else:
             return
 
-        os.system('clear')
-        print(printed)
+        print_output(printed)
         WaitKey(1)
-    print(time() - starttime)
+
 
 if __name__ == '__main__':
     # Settings for frame capture
@@ -141,10 +114,13 @@ if __name__ == '__main__':
     # Initialize OpenCV images
     inputframe = CreateImage(windowsize, 8, 1)
     rawframe = CreateImage(windowsize, 8, 1)
-    gradframe = CreateImage(windowsize, 8, 1)
-    lapframe = CreateImage(windowsize, 8, 1)
-    hybframe = CreateImage(windowsize, 8, 1)
+    # gradframe = CreateImage(windowsize, 8, 1)
+    # lapframe = CreateImage(windowsize, 8, 1)
+    # hybframe = CreateImage(windowsize, 8, 1)
     edges = CreateImage(windowsize, IPL_DEPTH_16S, 1)
-    scaled = CreateImage(scaledsize, 8, 1)
+    hybscaled = CreateImage(scaledsize, 8, 1)
+    gradscaled = CreateImage(scaledsize, 8, 1)
+    lapscaled = CreateImage(scaledsize, 8, 1)
+    summation = CreateMat(scaledsize[1], scaledsize[0], CV_8UC1)
 
-    run(gradient=True, laplacian=True)
+    run(gradient=True, laplacian=False)
