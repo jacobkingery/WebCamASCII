@@ -92,7 +92,10 @@ def all_process(rawframe):
 
 def run():
     """Capture and process feed from webcam"""
-    while True:
+    # while True:
+    from time import time
+    starttime = time()
+    for x in range(100):
         rawframe = capture_frame()
 
         printed = all_process(rawframe)
@@ -100,6 +103,7 @@ def run():
         os.system('clear')
         print(printed)
         WaitKey(1)
+    print(time() - starttime)
 
 
 if __name__ == '__main__':
