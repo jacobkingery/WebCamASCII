@@ -5,6 +5,10 @@ import os
 
 def capture_frame():
     """Capture frame from webcam, convert to grayscale, flip, and smooth."""
+    global wc
+    global fm
+    global inputframe
+
     CvtColor(QueryFrame(wc), inputframe, CV_RGB2GRAY)
     Flip(inputframe, flipMode=fm)
     Smooth(inputframe, inputframe, CV_MEDIAN)
@@ -14,6 +18,13 @@ def capture_frame():
 
 def hybrid_process(hybframe):
     """Process frame using a gradient-Laplacian hybrid."""
+    global edges
+    global ldeg
+    global scaledsize
+    global asciiGroup
+    global terminalwidth
+    global dw
+
     hybprinted = gradient_process(hybframe)
 
     Threshold(hybframe, hybframe, th, clr, CV_THRESH_BINARY)
@@ -27,8 +38,7 @@ def hybrid_process(hybframe):
         for x in range(scaled.width):
             pixelnum += 1
             if scaled[y, x] != 0:
-                hybprinted = (hybprinted[:pixelnum - 1] + asciiGroup[0] + (
-                    hybprinted[pixelnum:] * (pixelnum != len(hybprinted) - 1)))
+                hybprinted = (hybprinted[:pixelnum - 1] + asciiGroup[0] + (hybprinted[pixelnum:] * (pixelnum != (len(hybprinted) - 1))))
         pixelnum += 1 * (y != (scaled.height - 1))
 
     return hybprinted
@@ -36,6 +46,11 @@ def hybrid_process(hybframe):
 
 def gradient_process(gradframe):
     """Process frame using only a gradient."""
+    global scaled
+    global terminalwidth
+    global dw
+    global asciiGroup
+
     Resize(gradframe, scaled)
 
     printed = ''
@@ -51,6 +66,14 @@ def gradient_process(gradframe):
 
 def laplacian_process(lapframe):
     """Process frame using only a Laplacian."""
+    global th
+    global clr
+    global edges
+    global ldeg
+    global scaled
+    global terminalwidth
+    global dw    
+
     Threshold(lapframe, lapframe, th, clr, CV_THRESH_BINARY)
     Laplace(lapframe, edges, ldeg)
     Convert(edges, lapframe)
@@ -67,45 +90,19 @@ def laplacian_process(lapframe):
     return printed
 
 
-def all_process(rawframe):
-    """Process frame all three ways."""
-    Copy(rawframe, gradframe)
-    Copy(rawframe, lapframe)
-    Copy(rawframe, hybframe)
-    gradientprinted = gradient_process(gradframe).split('\n')
-    laplacianprinted = laplacian_process(lapframe).split('\n')
-    hybridprinted = hybrid_process(hybframe).split('\n')
-
-    printed = ''
-    for y in range(len(gradientprinted)):
-        gradienttrimmed = gradientprinted[y][(int((
-            terminalwidth - dw) / 2) - int((quadwidth - dqw) / 2)):]
-        printed = printed + gradienttrimmed + laplacianprinted[y] + '\n'
-    for y in range(len(hybridprinted)):
-        printed = printed + ' ' * (int((
-            terminalwidth - dqw) / 2) - int((terminalwidth - dw) / 2))
-        printed = printed + hybridprinted[
-            y] + '\n' * (y != (len(hybridprinted) - 1))
-
-    return printed
-
-
 def run(gradient, laplacian):
     """Capture and process feed from webcam"""
     while True:
         rawframe = capture_frame()
 
-        if display == 'fullscreen':
-            if gradient and laplacian:
-                printed = hybrid_process(rawframe)
-            elif gradient:
-                printed = gradient_process(rawframe)
-            elif laplacian:
-                printed = laplacian_process(rawframe)
-            else:
-                return
-        elif display == 'quadrants':
-            printed = all_process(rawframe)
+        if gradient and laplacian:
+            printed = hybrid_process(rawframe)
+        elif gradient:
+            printed = gradient_process(rawframe)
+        elif laplacian:
+            printed = laplacian_process(rawframe)
+        else:
+            return
 
         os.system('clear')
         print(printed)
@@ -133,18 +130,10 @@ if __name__ == '__main__':
     ldeg = laplaceDegree
 
     # Settings for sizing
-    display = 'fullscreen'
-    display = 'quadrants'
-    quadwidth = 152
-    desiredquadwidth = 110
-    dqw = desiredquadwidth
     terminalwidth = 304
     desiredwidth = 222
     dw = desiredwidth
-    if display == 'fullscreen':
-        scaledsize = (dw, int(dw / 2 * hght // wdth))
-    elif display == 'quadrants':
-        scaledsize = (dqw, int(dqw / 2 * hght // wdth))
+    scaledsize = (dw, int(dw / 2 * hght // wdth))
 
     # Initialize OpenCV images
     inputframe = CreateImage(windowsize, 8, 1)
@@ -155,4 +144,4 @@ if __name__ == '__main__':
     edges = CreateImage(windowsize, IPL_DEPTH_16S, 1)
     scaled = CreateImage(scaledsize, 8, 1)
 
-    run(gradient=True, laplacian=True)
+    run(gradient=False, laplacian=True)

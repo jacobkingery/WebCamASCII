@@ -90,22 +90,12 @@ def all_process(rawframe):
     return printed
 
 
-def run(gradient, laplacian):
+def run():
     """Capture and process feed from webcam"""
     while True:
         rawframe = capture_frame()
 
-        if display == 'fullscreen':
-            if gradient and laplacian:
-                printed = hybrid_process(rawframe)
-            elif gradient:
-                printed = gradient_process(rawframe)
-            elif laplacian:
-                printed = laplacian_process(rawframe)
-            else:
-                return
-        elif display == 'quadrants':
-            printed = all_process(rawframe)
+        printed = all_process(rawframe)
 
         os.system('clear')
         print(printed)
@@ -133,18 +123,13 @@ if __name__ == '__main__':
     ldeg = laplaceDegree
 
     # Settings for sizing
-    display = 'fullscreen'
-    display = 'quadrants'
     quadwidth = 152
     desiredquadwidth = 110
     dqw = desiredquadwidth
     terminalwidth = 304
     desiredwidth = 222
     dw = desiredwidth
-    if display == 'fullscreen':
-        scaledsize = (dw, int(dw / 2 * hght // wdth))
-    elif display == 'quadrants':
-        scaledsize = (dqw, int(dqw / 2 * hght // wdth))
+    scaledsize = (dqw, int(dqw / 2 * hght // wdth))
 
     # Initialize OpenCV images
     inputframe = CreateImage(windowsize, 8, 1)
@@ -155,4 +140,4 @@ if __name__ == '__main__':
     edges = CreateImage(windowsize, IPL_DEPTH_16S, 1)
     scaled = CreateImage(scaledsize, 8, 1)
 
-    run(gradient=True, laplacian=True)
+    run()
