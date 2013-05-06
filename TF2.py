@@ -4,7 +4,11 @@ import os
 
 
 def capture_frame():
-    """Capture frame from webcam, convert to grayscale, flip, and smooth."""
+    """Capture a frame from the webcam, convert to grayscale, flip, and smooth."""
+    global wc
+    global fm
+    global inputframe
+
     CvtColor(QueryFrame(wc), inputframe, CV_RGB2GRAY)
     Flip(inputframe, flipMode=fm)
     Smooth(inputframe, inputframe, CV_MEDIAN)
@@ -51,6 +55,14 @@ def laplacian_process(lapframe):
 
 def all_process(rawframe):
     """Process frame all three ways."""
+    global gradframe
+    global lapframe
+    global hybframe
+    global quadwidth
+    global dqw
+    global terminalwidth
+    global dw
+
     Copy(rawframe, gradframe)
     Copy(rawframe, lapframe)
     Copy(rawframe, hybframe)
@@ -73,7 +85,11 @@ def all_process(rawframe):
 
 
 def print_output(printmat):
-    """Print the image as a string of ASCII characters"""
+    """Print the image as a string of ASCII characters."""
+    global terminalwidth
+    global dw
+    global asciiGroup
+
     printed = ''
     for y in range(printmat.height):
         printed = printed + ' ' * int((terminalwidth - dw) / 2)
@@ -86,7 +102,7 @@ def print_output(printmat):
 
 
 def run():
-    """Capture and process feed from webcam"""
+    """Capture and process feed from webcam."""
     while True:
         rawframe = capture_frame()
 
@@ -128,7 +144,6 @@ if __name__ == '__main__':
 
     # Initialize OpenCV images
     inputframe = CreateImage(windowsize, 8, 1)
-    rawframe = CreateImage(windowsize, 8, 1)
     gradframe = CreateImage(windowsize, 8, 1)
     lapframe = CreateImage(windowsize, 8, 1)
     hybframe = CreateImage(windowsize, 8, 1)

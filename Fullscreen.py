@@ -38,7 +38,8 @@ def hybrid_process(hybframe):
         for x in range(scaled.width):
             pixelnum += 1
             if scaled[y, x] != 0:
-                hybprinted = (hybprinted[:pixelnum - 1] + asciiGroup[0] + (hybprinted[pixelnum:] * (pixelnum != (len(hybprinted) - 1))))
+                hybprinted = (hybprinted[:pixelnum - 1] + asciiGroup[0] + (
+                    hybprinted[pixelnum:] * (pixelnum != (len(hybprinted) - 1))))
         pixelnum += 1 * (y != (scaled.height - 1))
 
     return hybprinted
@@ -72,7 +73,7 @@ def laplacian_process(lapframe):
     global ldeg
     global scaled
     global terminalwidth
-    global dw    
+    global dw
 
     Threshold(lapframe, lapframe, th, clr, CV_THRESH_BINARY)
     Laplace(lapframe, edges, ldeg)
@@ -92,10 +93,7 @@ def laplacian_process(lapframe):
 
 def run(gradient, laplacian):
     """Capture and process feed from webcam"""
-    # while True:
-    from time import time
-    starttime = time()
-    for x in range(100):
+    while True:
         rawframe = capture_frame()
 
         if gradient and laplacian:
@@ -110,7 +108,7 @@ def run(gradient, laplacian):
         os.system('clear')
         print(printed)
         WaitKey(1)
-    print(time() - starttime)
+
 
 if __name__ == '__main__':
     # Settings for frame capture
