@@ -1,5 +1,7 @@
+#!/usr/bin/env python
 from __future__ import division
 from cv import *
+from sys import argv
 import os
 
 
@@ -69,6 +71,8 @@ def print_output(printmat):
 
 def run(gradient, laplacian):
     """Capture and process feed from webcam"""
+    initialize()
+
     while True:
         rawframe = capture_frame()
 
@@ -85,7 +89,27 @@ def run(gradient, laplacian):
         WaitKey(1)
 
 
-if __name__ == '__main__':
+def initialize():
+    """Initialize settings and images"""
+    global wc
+    global asciiGroup
+    global fm
+    global th
+    global clr
+    global ldeg
+    global quadwidth
+    global dqw
+    global terminalwidth
+    global dw
+    global scaledsize
+    global inputframe
+    global gradscaled
+    global edges
+    global lapscaled
+    global gradscaled
+    global summation
+
+
     # Settings for frame capture
     wc = CaptureFromCAM(0)
     asciiGroup = "#*oahbpqwmzcunxrt-+~<>:,^`. "
@@ -113,14 +137,13 @@ if __name__ == '__main__':
 
     # Initialize OpenCV images
     inputframe = CreateImage(windowsize, 8, 1)
-    rawframe = CreateImage(windowsize, 8, 1)
-    # gradframe = CreateImage(windowsize, 8, 1)
-    # lapframe = CreateImage(windowsize, 8, 1)
-    # hybframe = CreateImage(windowsize, 8, 1)
     edges = CreateImage(windowsize, IPL_DEPTH_16S, 1)
     hybscaled = CreateImage(scaledsize, 8, 1)
     gradscaled = CreateImage(scaledsize, 8, 1)
     lapscaled = CreateImage(scaledsize, 8, 1)
     summation = CreateMat(scaledsize[1], scaledsize[0], CV_8UC1)
 
+if __name__ == '__main__':
+    print(argv)
+    asdf
     run(gradient=True, laplacian=True)
