@@ -76,11 +76,11 @@ def run(mode, tw, fw):
     while True:
         rawframe = capture_frame()
 
-        if mode == 'h':
+        if mode == '-c':
             printed = hybrid_process(rawframe)
-        elif mode == 'g':
+        elif mode == '-g':
             printed = gradient_process(rawframe)
-        elif mode == 'l':
+        elif mode == '-l':
             printed = laplacian_process(rawframe)
 
         print_output(printed)
@@ -143,11 +143,12 @@ def initialize(tw, fw):
 
 def help():
     """Print help"""
-    print('g            :    Gradient mode')
-    print('l            :    Laplacian mode')
-    print('h            :    Hybrid mode')
-    print('-tw <int>    :    Set width of terminal')
-    print('-fw <int>    :    Set width of frame')
+    print('-g            :    Gradient mode')
+    print('-l            :    Laplacian mode')
+    print('-c            :    Combined mode')
+    print('-t            :    Trifecta')
+    print('-tw <int>     :    Set width of terminal')
+    print('-fw <int>     :    Set width of frame')
     exit(0)
 
 
@@ -162,7 +163,7 @@ if __name__ == '__main__':
         except IndexError:
             inp = False
             
-        if inp == 'g' or inp == 'l' or inp == 'h' and not mode:
+        if inp == '-g' or inp == '-l' or inp == '-c' or inp == '-t' and not mode:
             mode = inp
         elif inp == '-h' or inp == '--help':
             help()
@@ -182,10 +183,13 @@ if __name__ == '__main__':
                 pass
 
     if not mode:
-        mode = 'h'
+        mode = '-h'
     if not tw:
         tw = 304
     if not fw:
         fw = 222
+    if mode == '-t':
+        os.system('./Trifecta -tw ' + str(tw) +' -fw ' + str(fw))
+        exit(0)
 
     run(mode, tw, fw)
