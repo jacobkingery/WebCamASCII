@@ -1,0 +1,112 @@
+#! /usr/bin/env python 
+from __future__ import division
+from os import system
+from os import listdir
+from time import time
+from PIL import Image
+from sys import argv
+
+def initialize():
+	global vidname
+	global fps
+	global asciiGroup
+	fps = 20
+	vidname = "SPECIAL_NAME_DO_NOT_USE_CASUALLY.mp4"
+	asciiWeb = "##########**********oahkbdpqwmzcvunxrjft|?-+~<>!:,^`'.             "
+	asciiGroup = list(asciiWeb)
+
+def download(link):
+	global vidname
+	print("Downloading video...")
+	system("youtube-dl -q -o "+vidname+" "+link)
+	print("Video successfully downloaded. Exploding video into frames for processing...")
+
+def explode():
+	global fps
+	global vidname
+	system('ffmpeg -i '+vidname+' -r '+str(fps)+' -f image2 Frames/%8d.jpeg>/dev/null 2>&1')
+	print('VIDEO EXPLODED. Preparing to ASCIIfy...')
+	# extract sound
+	# ffmpeg -i SPECIAL_NAME_DO_NOT_USE_CASUALLY.mp4 -ab 128k -ac 2 -strict experimental -ar 44100 -vn audio_out.mp4
+	# ffmpeg -i audio_out.mp4 -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 audio.mp3
+	# # sudo apt-get install libavcodec-extra-53 ## DEPENDENCY
+	# mpg123 -q audio.mp3
+
+# TREADWARE: https://www.youtube.com/watch?v=t9dyMeA3BgE
+# Three input options: 
+	# Youtube video raw link (signal "youtube.com") - must be full url
+	# Video file on disk (signal ".")
+	# Search term for youtube - multiple terms must be wrapped in quotes
+def get_vid():
+	global vidname
+	#user_in = raw_input('Enter the the video you wish to watch in ASCII: ')
+	try:
+		user_in = argv[1]
+	except IndexError:
+		user_in = ''
+	if user_in!='':
+		system("mkdir -p Frames")
+		print('Making and/or clearing directories...')
+		system('rm -rf Frames/*')
+		system('rm -rf '+vidname)
+		print('Directories cleared.')
+		if "youtube.com" in user_in:
+			download(user_in)
+		elif "." in user_in:
+			vidname = user_in
+		else:
+			download("ytsearch:"+user_in)
+		explode()
+
+def asciify():
+	global asciiGroup
+	frames=len(listdir('./Frames'))
+
+	timing=0
+
+	begintime=time()
+	framestart=time()
+	starttime=time()
+	i = 1
+	while i<frames:
+		txtnum=str(i).rjust(8,'0')
+
+		img = Image.open('Frames/'+txtnum+'.jpeg')
+		height = img.size[1]
+		width = img.size[0]
+		w = int(170*1.5)
+		h = int(0.5 * w * height // width)
+		size = (w, h)
+		img.draft('L', img.size)
+		img = img.resize(size)
+
+		gray = []
+		for y in range(h):
+				gray.append([])
+				for x in range(w):
+						val = img.getpixel((x,y))
+						gray[y].append(val)
+
+		printed = ''
+		for row in gray:
+				for pixel in row:
+						printed = printed + asciiGroup[int(len(asciiGroup) - (pixel * len(asciiGroup))//256 - 1)]
+				printed = printed + '\n'
+
+		while (time()-framestart) < (1/fps):
+			pass
+		i+=1
+			
+		framestart=time()
+		system('clear')
+		print(printed)
+
+	endtime=time()
+	print('Video length: '+str(endtime-starttime))
+	print('Expected: '+str(frames/fps))
+	print('DONE.')
+
+if __name__=='__main__':
+	initialize()
+	get_vid()
+	asciify()

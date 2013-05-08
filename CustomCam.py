@@ -8,6 +8,7 @@ import customconvolve as cc
 def run():
 	wc = CaptureFromCAM(0)
 	asciiGroup = "#*oahbpqwmzcunxrt-+~<>:,^`. "
+	asciiGroup = "##########**********oahkbdpqwmzcvunxrjft|?-+~<>!:,^`'...    "[::-1]
 	windowsize = GetSize(QueryFrame(wc))
 	hght = windowsize[1]
 	wdth = windowsize[0]
@@ -28,7 +29,7 @@ def run():
 	scaled = CreateImage(scaledsize, 8, 1)
 
 	while True:
-		asciiGroup = "#*oahbpqwmzcunxrt-+~<>:,^`. "
+		# asciiGroup = "#*oahbpqwmzcunxrt-+~<>:,^`. "
 		CvtColor(QueryFrame(wc),frame,CV_RGB2GRAY)
 		Flip(frame,flipMode=fm)
 
@@ -44,7 +45,7 @@ def run():
 		frame = cc.convolve(frame,'uberlaplace')
 		Resize(frame,scaled)
 
-		asciiGroup = asciiGroup[::-1]
+		#asciiGroup = asciiGroup[::-1]
 		pixelnum = 0
 		for y in range(scaled.height):
 			pixelnum += int((304-dw)/2)
