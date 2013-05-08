@@ -112,7 +112,7 @@ def initialize():
 
     # Settings for frame capture
     wc = CaptureFromCAM(0)
-    asciiGroup = "#*oahbpqwmzcunxrt-+~<>:,^`. "
+    asciiGroup = "####**oahbpqwmzcunxrt-+~<>:,^`...     "
     windowsize = GetSize(QueryFrame(wc))
     hght = windowsize[1]
     wdth = windowsize[0]
@@ -129,7 +129,7 @@ def initialize():
     laplaceDegree = 7
     ldeg = laplaceDegree
 
-    # Settings for sizing
+    # Settings for sizing (for fullscreened terminal on 1600x900 screen)
     terminalwidth = 304
     desiredwidth = 222
     dw = desiredwidth
