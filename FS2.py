@@ -1,7 +1,5 @@
-#!/usr/bin/env python
 from __future__ import division
 from cv import *
-from sys import argv
 import os
 
 
@@ -144,6 +142,4 @@ def initialize():
     summation = CreateMat(scaledsize[1], scaledsize[0], CV_8UC1)
 
 if __name__ == '__main__':
-    print(argv)
-    asdf
     run(gradient=True, laplacian=True)
