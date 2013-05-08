@@ -1,6 +1,9 @@
 This is a Software Design class project.
 
-In order to view the ASCII-fied images, 
-I recommend using Konsole instead of Terminal because of the faster printing speed.  
+The software was developed using Konsole 
+instead of Terminal because of its faster
+printing speed.  Thus, it is suggested that
+Konsole is used to run these files.
 
-The default size requires you to use font size 5.
+The default terminal width is 304 characters.
+
