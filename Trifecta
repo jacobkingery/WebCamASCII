@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 from __future__ import division
 from cv import *
+from sys import argv, exit
 import os
+
 
 
 def capture_frame():
@@ -102,9 +104,9 @@ def print_output(printmat):
     return printed
 
 
-def run():
+def run(tw, fw):
     """Capture and process feed from webcam."""
-    initialize()
+    initialize(tw, fw)
 
     while True:
         rawframe = capture_frame()
@@ -116,7 +118,7 @@ def run():
         WaitKey(1)
 
 
-def initialize():
+def initialize(tw, fw):
     """Initialize settings and images"""
     global wc
     global asciiGroup
@@ -141,7 +143,7 @@ def initialize():
 
     # Settings for frame capture
     wc = CaptureFromCAM(0)
-    asciiGroup = "#*oahbpqwmzcunxrt-+~<>:,^`. "
+    asciiGroup = "####**oahbpqwmzcunxrt-+~<>:,^`...     "
     windowsize = GetSize(QueryFrame(wc))
     hght = windowsize[1]
     wdth = windowsize[0]
@@ -158,15 +160,16 @@ def initialize():
     laplaceDegree = 7
     ldeg = laplaceDegree
 
-    # Settings for sizing
-    quadwidth = 152
-    desiredquadwidth = 110
-    dqw = desiredquadwidth
-    terminalwidth = 304
-    desiredwidth = 222
+    # Settings for sizing (for fullscreened terminal on 1600x900 screen)
+    terminalwidth = tw
+    desiredwidth = fw
     dw = desiredwidth
-    scaledsize = (dqw, int(dqw / 2 * hght // wdth))
+    quadwidth = int(terminalwidth/2)
+    desiredquadwidth = int(dw/2)
+    dqw = desiredquadwidth
 
+    scaledsize = (dqw, int(dqw / 2 * hght // wdth))
+    
     # Initialize OpenCV images
     inputframe = CreateImage(windowsize, 8, 1)
     gradframe = CreateImage(windowsize, 8, 1)
@@ -178,5 +181,45 @@ def initialize():
     lapscaled = CreateImage(scaledsize, 8, 1)
     summation = CreateMat(scaledsize[1], scaledsize[0], CV_8UC1)
 
+
+def help():
+    """Print help"""
+    print('-tw <int>    :    Set width of terminal')
+    print('-fw <int>    :    Set width of frame')
+    exit(0)
+
+
 if __name__ == '__main__':
-    run()
+    tw = False
+    fw = False
+
+    for i in range(1, len(argv)):
+        try:
+            inp = argv[i]
+        except IndexError:
+            inp = False
+
+        if inp == '-h' or inp == '--help':
+            help()
+        elif inp == '-tw':
+            try:
+                tw = int(argv[i+1])
+            except IndexError:
+                pass
+            except ValueError:
+                pass
+        elif inp == '-fw':
+            try:
+                fw = int(argv[i+1])
+            except IndexError:
+                pass
+            except ValueError:
+                pass
+
+    if not tw:
+        tw = 304
+    if not fw:
+        fw = 222
+
+
+    run(tw, fw)

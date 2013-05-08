@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division
 from cv import *
-from sys import argv
+from sys import argv, exit
 import os
 
 
@@ -69,9 +69,9 @@ def print_output(printmat):
     print(printed)
 
 
-def run(mode):
+def run(mode, tw, fw):
     """Capture and process feed from webcam"""
-    initialize()
+    initialize(tw, fw)
 
     while True:
         rawframe = capture_frame()
@@ -82,15 +82,12 @@ def run(mode):
             printed = gradient_process(rawframe)
         elif mode == 'l':
             printed = laplacian_process(rawframe)
-        else:
-            print("Invalid mode; please use 'g', 'l', or 'h'.")
-            return
 
         print_output(printed)
         WaitKey(1)
 
 
-def initialize():
+def initialize(tw, fw):
     """Initialize settings and images"""
     global wc
     global asciiGroup
@@ -112,7 +109,7 @@ def initialize():
 
     # Settings for frame capture
     wc = CaptureFromCAM(0)
-    asciiGroup = "#*oahbpqwmzcunxrt-+~<>:,^`. "
+    asciiGroup = "####**oahbpqwmzcunxrt-+~<>:,^`...     "
     windowsize = GetSize(QueryFrame(wc))
     hght = windowsize[1]
     wdth = windowsize[0]
@@ -129,9 +126,9 @@ def initialize():
     laplaceDegree = 7
     ldeg = laplaceDegree
 
-    # Settings for sizing
-    terminalwidth = 304
-    desiredwidth = 222
+    # Settings for sizing (for fullscreened terminal on 1600x900 screen)
+    terminalwidth = tw
+    desiredwidth = fw
     dw = desiredwidth
     scaledsize = (dw, int(dw / 2 * hght // wdth))
 
@@ -143,10 +140,52 @@ def initialize():
     lapscaled = CreateImage(scaledsize, 8, 1)
     summation = CreateMat(scaledsize[1], scaledsize[0], CV_8UC1)
 
-if __name__ == '__main__':
-    try:
-        mode = argv[1]
-    except IndexError:
-        mode = 'h'
 
-    run(mode)
+def help():
+    """Print help"""
+    print('g            :    Gradient mode')
+    print('l            :    Laplacian mode')
+    print('h            :    Hybrid mode')
+    print('-tw <int>    :    Set width of terminal')
+    print('-fw <int>    :    Set width of frame')
+    exit(0)
+
+
+if __name__ == '__main__':
+    mode = False
+    tw = False
+    fw = False
+
+    for i in range(1, len(argv)):
+        try:
+            inp = argv[i]
+        except IndexError:
+            inp = False
+            
+        if inp == 'g' or inp == 'l' or inp == 'h' and not mode:
+            mode = inp
+        elif inp == '-h' or inp == '--help':
+            help()
+        elif inp == '-tw':
+            try:
+                tw = int(argv[i+1])
+            except IndexError:
+                pass
+            except ValueError:
+                pass
+        elif inp == '-fw':
+            try:
+                fw = int(argv[i+1])
+            except IndexError:
+                pass
+            except ValueError:
+                pass
+
+    if not mode:
+        mode = 'h'
+    if not tw:
+        tw = 304
+    if not fw:
+        fw = 222
+
+    run(mode, tw, fw)
