@@ -104,9 +104,9 @@ def print_output(printmat):
     return printed
 
 
-def run(tw, fw):
+def run(tw, fw, invert):
     """Capture and process feed from webcam."""
-    initialize(tw, fw)
+    initialize(tw, fw, invert)
 
     while True:
         rawframe = capture_frame()
@@ -118,7 +118,7 @@ def run(tw, fw):
         WaitKey(1)
 
 
-def initialize(tw, fw):
+def initialize(tw, fw, invert):
     """Initialize settings and images"""
     global wc
     global asciiGroup
@@ -143,7 +143,11 @@ def initialize(tw, fw):
 
     # Settings for frame capture
     wc = CaptureFromCAM(0)
-    asciiGroup = "####**oahbpqwmzcunxrt-+~<>:,^`...     "
+    # Old ASCII Group
+    # asciiGroup = "####**oahbpqwmzcunxrt-+~<>:,^`...     "
+    asciiGroup = "#########**********oahkbdpqwmzcvunxrjft|?-+~<>!:,^`'....      "
+    if invert:
+        asciiGroup = asciiGroup[::-1]
     windowsize = GetSize(QueryFrame(wc))
     hght = windowsize[1]
     wdth = windowsize[0]
@@ -189,9 +193,10 @@ def help():
     exit(0)
 
 
-if __name__ == '__main__':
+def arg_processing():
     tw = False
     fw = False
+    invert = False
 
     for i in range(1, len(argv)):
         try:
@@ -215,11 +220,16 @@ if __name__ == '__main__':
                 pass
             except ValueError:
                 pass
+        elif inp == '-i':
+            invert = True
 
     if not tw:
         tw = 304
     if not fw:
         fw = 222
+    return [tw, fw, invert]
 
 
-    run(tw, fw)
+if __name__ == '__main__':
+    [tw, fw, invert] = arg_processing()
+    run(tw, fw, invert)
